@@ -36,20 +36,22 @@ const App = () => {
       <h1>Notes</h1>
       <div>
         <button onClick={() => setShowAll(!showAll)}>
-          show {showAll ? "important" : "all"}
+          show {showAll ? 'important' : 'all' }
         </button>
       </div>
       <ul>
-        {notesToShow.map((note) => (
+        {notesToShow.map(note => 
           <Note key={note.id} note={note} />
-        ))}
+        )}
       </ul>
       <form onSubmit={addNote}>
-        <input value={newNote} onChange={handleNoteChange} />
+
+        <input value={newNote}
+        onChange={handleNoteChange} />
         <button type="submit">save</button>
-      </form>
+      </form>   
     </div>
   );
 };
 
-export default App;
+export default App
