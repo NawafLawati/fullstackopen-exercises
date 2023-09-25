@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import axios from "axios";
+import personService from "./services/persons"
 
 const App = () => {
   const [persons, setPersons] = useState([]);
@@ -55,7 +56,7 @@ const App = () => {
         <div>
           {persons.map((person) => (
             <div key={person.id}>
-              {person.name} {person.number}
+              {person.name} {person.number} <button onClick={() =>handleDelete(person.id)}>delete</button>
               <br />
             </div>
           ))}
@@ -85,18 +86,55 @@ const App = () => {
     const personObject = {
       name: newName,
       number: newNumber,
-      id: persons.length + 1,
     };
-    if (persons.some((p) => p.name == newName)) {
-      alert(`${newName} is already added to phonebook`);
-    } else if (persons.some((p) => p.number == newNumber)) {
+  
+    const existingPerson = persons.find(p => p.name === newName);
+  
+    if (existingPerson) {
+      const confirmUpdate = window.confirm(`${newName} is already added to the phonebook, replace the old number with a new one?`);
+      
+      if (confirmUpdate) {
+        personService
+          .update(existingPerson.id, personObject)
+          .then(updatedPerson => {
+            setPersons(persons.map(p => p.id !== existingPerson.id ? p : updatedPerson));
+            setNewName("");
+            setNewNumber("");
+          })
+          .catch(error => {
+            console.error("Error updating person:", error);
+            alert("There was an error updating the person. Please try again.");
+          });
+      }
+    } else if (persons.some(p => p.number === newNumber)) {
       alert(`The number ${newNumber} is already taken`);
     } else {
-      setPersons(persons.concat(personObject));
-      setNewName("");
-      setNewNumber(0);
+      personService
+        .create(personObject)
+        .then(returnedPerson => {
+          setPersons(persons.concat(returnedPerson));
+          setNewName("");
+          setNewNumber("");
+        })
+        .catch(error => {
+          console.error("Error adding person:", error);
+          alert("There was an error adding the person. Please try again.");
+        });
     }
   };
+  
+
+  const handleDelete = (id) =>{
+
+    const person = persons.find(n => n.id === id)
+    console.log(person, id);
+    personService
+    .deleting(id)
+    .then(() =>{
+      const updatedPersons = persons.filter(p => p.id !== id);
+      setPersons(updatedPersons);
+    })
+  }
 
   const handleNumberChange = (event) => {
     console.log(event.target.value);
