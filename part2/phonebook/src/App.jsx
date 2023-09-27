@@ -11,7 +11,7 @@ const App = () => {
   useEffect(() => {
     console.log("effect");
     axios.get("http://localhost:3001/persons").then((response) => {
-      console.log("promise fulfilled");
+      console.log("promise fulfilled: xdd");
       setPersons(response.data);
     });
   }, []);
